@@ -17,11 +17,16 @@ const Form = () => {
         setMine(e.target.value);
     }, []);
 
+    const onClickButton = useCallback(() => {
+
+    }, []);
+
     return (
         <>
             <input type="number" placeholder="세로" value={row} onChange={onChangeRow} />
             <input type="number" placeholder="가로" value={cell} onChange={onChangeCell} />
             <input type="number" placeholder="지뢰" value={mine} onChange={onChangeMine} />
+            <button onClick={onClickButton}>시작</button>
         </>
     );
 }

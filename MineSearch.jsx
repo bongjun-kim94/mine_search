@@ -1,5 +1,10 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, createContext } from 'react';
 import Table from './Table';
+import Form from './Form';
+
+const TableContext = createContext({
+
+});
 
 const initialState= {
     tableData: [],
@@ -19,10 +24,12 @@ const MineSearch = () => {
 
     return (
         <>
-            <Form />
-            <div>{state.timer}</div>
-            <Table />
-            <div>{result}</div>
+            <TableContext.Provider value={{ tableData: state.tableData, dispatch }}>
+                <Form />
+                <div>{state.timer}</div>
+                <Table />
+                <div>{result}</div>
+            </TableContext.Provider>
         </>
     )
 };
