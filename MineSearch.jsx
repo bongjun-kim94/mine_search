@@ -25,6 +25,36 @@ export const TableContext = createContext({
     dispatch: () => {},
 });
 
+// tableData에 지뢰를 심는 함수
+const plantMine = (row, cell, mine) => {
+    console.log(row, cell, mine);
+    // 0~99까지의 숫자
+    const candidate = Array(row * cell).fill().map((arr, i) => {
+        return i;
+    });
+    const shuffle = [];
+    while (candidate.length > row * cell - mine) {
+        const chosen = candidate.splice(Math.floor(Math.random() * candidate.length), 1)[0];
+        shuffle.push(chosen);
+    }
+    const data = [];
+    // 2차원배열 생성
+    for (let i = 0; i < row; i++) {
+        const rowData = [];
+        data.push(rowData);
+        for (let j = 0; j < cell; j++) {
+            rowData.push(CODE.NORMAL);
+        }
+    }
+    // 몇 , 몇 , 인지 계산 하는 코드
+    for (let k = 0; k < shuffle.length; k++) {
+        const ver = Math.floor(shuffle[k] / cell);
+        const hor = shuffle[k] % cell;
+        data[ver][hor] = CODE.MINE;
+    }
+    return data;
+};
+
 const initialState= {
     tableData: [],
     timer: 0,
@@ -47,6 +77,7 @@ const reducer = (state, action) => {
 
 const MineSearch = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
+    // state.tableData가 변경될 때 갱신
     const value = useMemo(() => ({ tableData: state.tableData, dispatch }), [state.tableData]);
 
     return (
