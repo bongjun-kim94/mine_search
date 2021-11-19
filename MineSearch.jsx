@@ -59,6 +59,7 @@ const initialState= {
     tableData: [],
     timer: 0,
     result: '',
+    halted: false,
 };
 
 export const START_GAME = 'START_GAME';
@@ -78,7 +79,17 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 tableData,
-            }
+            };
+        case CLICK_MINE: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            tableData[action.row][action.cell] = CODE.CLICKED_MINE;
+            return {
+                ...state,
+                tableData,
+                halted: true,
+            };
+        }   
         default:
             return state;
     }
