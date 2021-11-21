@@ -50,8 +50,11 @@ const getTdText = (code) => {
 };
 
 const Td = ({ rowIndex, cellIndex }) => {
-    const { tableData, dispatch } = useContext(TableContext);
+    const { tableData, dispatch, halted } = useContext(TableContext);
     const onClickTd = useCallback(() => {
+        if (halted) {
+            return;
+        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.OPENED:
             case CODE.FLAG_MINE:
@@ -69,6 +72,9 @@ const Td = ({ rowIndex, cellIndex }) => {
 
     const onRightClickTd = useCallback((e) => {
         e.preventDefault();
+        if (halted) {
+            return;
+        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.NORMAL:
             case CODE.MINE:
