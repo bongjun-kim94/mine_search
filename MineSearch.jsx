@@ -75,27 +75,27 @@ const reducer = (state, action) => {
             let around = [];
             // 내 윗줄이 있으면 그 윗줄 세 칸을 검사대상에 넣어줌
             if (tableData[action.row - 1]) {
-                around.concat(
+                around = around.concat(
                     tableData[action.row - 1][action.cell - 1],
                     tableData[action.row - 1][action.cell],
                     tableData[action.row - 1][action.cell + 1],
                 );
             }
             // 내 왼쪽칸, 오른쪽칸
-            around.concat(
+            around = around.concat(
                 tableData[action.row][action.cell - 1],
                 tableData[action.row][action.cell + 1],
             );
             // 내 아랫줄이 있으면
             if (tableData[action.row + 1]) {
-                around.concat(
+                around = around.concat(
                     tableData[action.row + 1][action.cell - 1],
                     tableData[action.row + 1][action.cell],
                     tableData[action.row + 1][action.cell + 1],
                 );
             }
             // 주변 8칸 중에 지뢰인 칸을 세는 함수
-            const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v));
+            const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
             tableData[action.row][action.cell] = count;
             return {
                 ...state,
