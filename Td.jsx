@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, memo } from 'react';
 import { CODE, OPEN_CELL, TableContext } from './MineSearch';
 
 const getTdStyle = (code) => {
@@ -45,16 +45,13 @@ const getTdText = (code) => {
         case CODE.QUESTION:
             return '?';
         default:
-            return code;
+            return '';
     } 
 };
 
-const Td = ({ rowIndex, cellIndex }) => {
-    const { tableData, dispatch, halted } = useContext(TableContext);
+const Td = memo(({ rowIndex, cellIndex }) => {
+    const { tableData, dispatch } = useContext(TableContext);
     const onClickTd = useCallback(() => {
-        if (halted) {
-            return;
-        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.OPENED:
             case CODE.FLAG_MINE:
@@ -72,9 +69,6 @@ const Td = ({ rowIndex, cellIndex }) => {
 
     const onRightClickTd = useCallback((e) => {
         e.preventDefault();
-        if (halted) {
-            return;
-        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.NORMAL:
             case CODE.MINE:
@@ -105,6 +99,6 @@ const Td = ({ rowIndex, cellIndex }) => {
             </td>
         </>
     );
-};
+});
 
 export default Td;

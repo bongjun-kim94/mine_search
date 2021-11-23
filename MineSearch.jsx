@@ -15,17 +15,15 @@ export const CODE = {
 
 // 다른 파일에서 쓸 수 있게 export
 export const TableContext = createContext({
-    tableData: [],
-    halted: true,
+    tableData: [
+        [-1, -1, -1, -1, -1, -1, -1],
+        [-7, -1, -1, -1, -1, -1, -1],
+        [-1, -7, -1, -7, -7, -1, -1],
+        [],
+        [],
+    ],
     dispatch: () => {},
 });
-
-const initialState = {
-    tableData: [],
-    timer: 0,
-    result: '',
-    halted: true,
-};
 
 // tableData에 지뢰를 심는 함수
 const plantMine = (row, cell, mine) => {
@@ -57,6 +55,13 @@ const plantMine = (row, cell, mine) => {
     return data;
 };
 
+const initialState= {
+    tableData: [],
+    timer: 0,
+    result: '',
+    halted: false,
+};
+
 export const START_GAME = 'START_GAME';
 export const OPEN_CELL = 'OPEN_CELL';
 
@@ -65,38 +70,12 @@ const reducer = (state, action) => {
         case START_GAME:
             return {
                 ...state,
-                tableData: plantMine(action.row, action.cell, action.mine),
-                halted: false,
+                tableData: plantMine(action.row, action.cell, action.mine)
             };
         case OPEN_CELL:
             const tableData = [...state.tableData];
             tableData[action.row] = [...state.tableData[action.row]];
             tableData[action.row][action.cell] = CODE.OPENED;
-            let around = [];
-            // 내 윗줄이 있으면 그 윗줄 세 칸을 검사대상에 넣어줌
-            if (tableData[action.row - 1]) {
-                around = around.concat(
-                    tableData[action.row - 1][action.cell - 1],
-                    tableData[action.row - 1][action.cell],
-                    tableData[action.row - 1][action.cell + 1],
-                );
-            }
-            // 내 왼쪽칸, 오른쪽칸
-            around = around.concat(
-                tableData[action.row][action.cell - 1],
-                tableData[action.row][action.cell + 1],
-            );
-            // 내 아랫줄이 있으면
-            if (tableData[action.row + 1]) {
-                around = around.concat(
-                    tableData[action.row + 1][action.cell - 1],
-                    tableData[action.row + 1][action.cell],
-                    tableData[action.row + 1][action.cell + 1],
-                );
-            }
-            // 주변 8칸 중에 지뢰인 칸을 세는 함수
-            const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
-            tableData[action.row][action.cell] = count;
             return {
                 ...state,
                 tableData,
@@ -110,49 +89,7 @@ const reducer = (state, action) => {
                 tableData,
                 halted: true,
             };
-        }
-        case FLAG_CELL: {
-            const tableData = [...state.tableData];
-            tableData[action.row] = [...state.tableData[action.row]];
-            // 지뢰가 있는 칸이면
-            if (tableData[action.row][action.cell] == CODE.MINE){
-                tableData[action.row][action.cell] = CODE.FLAG_MINE;
-            } else {
-                tableData[action.row][action.cell] = CODE.FLAG;
-            }
-            return {
-                ...state,
-                tableData, 
-            };
-        }
-        case QUESTION_CELL: {
-            const tableData = [...state.tableData];
-            tableData[action.row] = [...state.tableData[action.row]];
-            // 지뢰가 있는 칸이면
-            if (tableData[action.row][action.cell] == CODE.FLAG_MINE){
-                tableData[action.row][action.cell] = CODE.QUESTION_MINE;
-            } else {
-                tableData[action.row][action.cell] = CODE.QUESTION;
-            }
-            return {
-                ...state,
-                tableData, 
-            };
-        }
-        case NORMALIZE_CELL: {
-            const tableData = [...state.tableData];
-            tableData[action.row] = [...state.tableData[action.row]];
-            // 지뢰가 있는 칸이면
-            if (tableData[action.row][action.cell] == CODE.QUESTION_MINE){
-                tableData[action.row][action.cell] = CODE.MINE;
-            } else {
-                tableData[action.row][action.cell] = CODE.NORMAL;
-            }
-            return {
-                ...state,
-                tableData, 
-            };
-        }
+        }   
         default:
             return state;
     }
@@ -160,15 +97,14 @@ const reducer = (state, action) => {
 
 const MineSearch = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
-    const { tableData, halted, timer, result} = state;
     // state.tableData가 변경될 때 갱신
-    const value = useMemo(() => ({ tableData: tableData, halted: halted, dispatch }), [tableData, halted]);
+    const value = useMemo(() => ({ tableData: state.tableData, dispatch }), [state.tableData]);
 
     return (
         <>
             <TableContext.Provider value={value}>
                 <Form />
-                <div>{timer}</div>
+                <div>{state.timer}</div>
                 <Table />
                 <div>{result}</div>
             </TableContext.Provider>
