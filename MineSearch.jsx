@@ -15,15 +15,17 @@ export const CODE = {
 
 // 다른 파일에서 쓸 수 있게 export
 export const TableContext = createContext({
-    tableData: [
-        [-1, -1, -1, -1, -1, -1, -1],
-        [-7, -1, -1, -1, -1, -1, -1],
-        [-1, -7, -1, -7, -7, -1, -1],
-        [],
-        [],
-    ],
+    tableData: [],
+    halted: true,
     dispatch: () => {},
 });
+
+const initialState= {
+    tableData: [],
+    timer: 0,
+    result: '',
+    halted: false,
+};
 
 // tableData에 지뢰를 심는 함수
 const plantMine = (row, cell, mine) => {
@@ -55,13 +57,6 @@ const plantMine = (row, cell, mine) => {
     return data;
 };
 
-const initialState= {
-    tableData: [],
-    timer: 0,
-    result: '',
-    halted: false,
-};
-
 export const START_GAME = 'START_GAME';
 export const OPEN_CELL = 'OPEN_CELL';
 
@@ -90,6 +85,45 @@ const reducer = (state, action) => {
                 halted: true,
             };
         }   
+        case FLAG_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.MINE) {
+              tableData[action.row][action.cell] = CODE.FLAG_MINE;
+            } else {
+              tableData[action.row][action.cell] = CODE.FLAG;
+            }
+            return {
+              ...state,
+              tableData,
+            };
+        }
+        case QUESTION_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.FLAG_MINE) {
+              tableData[action.row][action.cell] = CODE.QUESTION_MINE;
+            } else {
+              tableData[action.row][action.cell] = CODE.QUESTION;
+            }
+            return {
+              ...state,
+              tableData,
+            };
+        }
+        case NORMALIZE_CELL: {
+            const tableData = [...state.tableData];
+            tableData[action.row] = [...state.tableData[action.row]];
+            if (tableData[action.row][action.cell] === CODE.QUESTION_MINE) {
+              tableData[action.row][action.cell] = CODE.MINE;
+            } else {
+              tableData[action.row][action.cell] = CODE.NORMAL;
+            }
+            return {
+              ...state,
+              tableData,
+            };
+        }
         default:
             return state;
     }
