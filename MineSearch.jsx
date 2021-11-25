@@ -69,34 +69,58 @@ const reducer = (state, action) => {
             };
         case OPEN_CELL:
             const tableData = [...state.tableData];
-            tableData[action.row] = [...state.tableData[action.row]];
+            // tableData[action.row] = [...state.tableData[action.row]];
             tableData.forEach((row, i) => {
-                tableData[i]
-            })
-            let around = [];
-            // 현재 샐의 윗 줄
-            if (tableData[action.row - 1]) {
+                tableData[i] = [...state.tableData[i]];
+            });
+            // 내 기준으로 검사하는 함수
+            // row, cell은 매개변수화를 시켰기 때문에 action 제거
+            const checkArround = (row, cell) => {
+                let around = [];
+                // 내 기준에서 셀의 윗 줄
+                if (tableData[row - 1]) {
+                    around = around.concat(
+                        tableData[row - 1][cell - 1],
+                        tableData[row - 1][cell],
+                        tableData[row - 1][cell + 1],
+                    );
+                }
+                // 내 기준에서 좌우
                 around = around.concat(
-                    tableData[action.row - 1][action.cell - 1],
-                    tableData[action.row - 1][action.cell],
-                    tableData[action.row - 1][action.cell + 1],
+                    tableData[row][cell - 1],
+                    tableData[row][cell + 1],
                 );
-            }
-            // 현재 셀의 좌우
-            around = around.concat(
-                tableData[action.row][action.cell - 1],
-                tableData[action.row][action.cell + 1],
-            );
-            // 현재 셀의 아랫줄
-            if (tableData[action.row - 1]) {
-                around = around.concat(
-                    tableData[action.row + 1][action.cell - 1],
-                    tableData[action.row + 1][action.cell],
-                    tableData[action.row + 1][action.cell + 1],
-                );
-            }
-            const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
-            
+                // 내 기준에서 셀의 아랫줄
+                if (tableData[row - 1]) {
+                    around = around.concat(
+                        tableData[row + 1][cell - 1],
+                        tableData[row + 1][cell],
+                        tableData[row + 1][cell + 1],
+                    );
+                }
+                const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+                tableData[row][cell] = count;
+                // 내가 빈 칸이면 주변을 다 검사
+                if (count === 0) {
+                    const near = [];
+                    if (row - 1 > -1) {
+                        near.push([row - 1, cell - 1]);
+                        near.push([row - 1, cell]);
+                        near.push([row - 1, cell + 1]);
+                    }
+                    near.push([row, cell - 1]);
+                    near.push([row, cell + 1]);
+                    if (row - 1 > -1) {
+                        near.push([row + 1, cell - 1]);
+                        near.push([row + 1, cell]);
+                        near.push([row + 1, cell + 1]);
+                    }
+                } else {
+                    
+                }
+            };
+            // 내 기준으로 검사를 해서 
+            checkArround(action.row, action.cell);
             return {
                 ...state,
                 tableData,
