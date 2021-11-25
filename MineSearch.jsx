@@ -70,7 +70,33 @@ const reducer = (state, action) => {
         case OPEN_CELL:
             const tableData = [...state.tableData];
             tableData[action.row] = [...state.tableData[action.row]];
-            tableData[action.row][action.cell] = CODE.OPENED;
+            tableData.forEach((row, i) => {
+                tableData[i]
+            })
+            let around = [];
+            // 현재 샐의 윗 줄
+            if (tableData[action.row - 1]) {
+                around = around.concat(
+                    tableData[action.row - 1][action.cell - 1],
+                    tableData[action.row - 1][action.cell],
+                    tableData[action.row - 1][action.cell + 1],
+                );
+            }
+            // 현재 셀의 좌우
+            around = around.concat(
+                tableData[action.row][action.cell - 1],
+                tableData[action.row][action.cell + 1],
+            );
+            // 현재 셀의 아랫줄
+            if (tableData[action.row - 1]) {
+                around = around.concat(
+                    tableData[action.row + 1][action.cell - 1],
+                    tableData[action.row + 1][action.cell],
+                    tableData[action.row + 1][action.cell + 1],
+                );
+            }
+            const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+            
             return {
                 ...state,
                 tableData,
