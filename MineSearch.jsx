@@ -73,9 +73,17 @@ const reducer = (state, action) => {
             tableData.forEach((row, i) => {
                 tableData[i] = [...state.tableData[i]];
             });
-            // 내 기준으로 검사하는 함수
+            // 내 기준으로 검사하는 함수, 주변칸의 지뢰개수를 검사하는 함수
             // row, cell은 매개변수화를 시켰기 때문에 action 제거
-            const checkArround = (row, cell) => {
+            const checkAround = (row, cell) => {
+                // 닫힌 칸이 아닌경우 한 번에 열리면 안되니까 걸러줌
+                if ([CODE.OPENED, CODE.FLAG_MINE, CODE.FLAG, CODE.QUESTION_MINE, CODE.QUESTION].includes(tableData[row][cell])) {
+                    return;
+                }
+                // 상하좌우 칸이 아닌 경우 필터링
+                if (row < 0 || row > tableData.length || cell < 0 || cell > tableData[0].length) {
+                    return;
+                }
                 let around = [];
                 // 내 기준에서 셀의 윗 줄
                 if (tableData[row - 1]) {
@@ -103,6 +111,7 @@ const reducer = (state, action) => {
                 // 내가 빈 칸이면 주변을 다 검사
                 if (count === 0) {
                     const near = [];
+                    // 제일 윗칸이 없을때
                     if (row - 1 > -1) {
                         near.push([row - 1, cell - 1]);
                         near.push([row - 1, cell]);
@@ -110,11 +119,15 @@ const reducer = (state, action) => {
                     }
                     near.push([row, cell - 1]);
                     near.push([row, cell + 1]);
-                    if (row - 1 > -1) {
+                    // 제일 아랫칸이 없을때 그 것들 없애주는 것
+                    if (row + 1 > tableData.length) {
                         near.push([row + 1, cell - 1]);
                         near.push([row + 1, cell]);
                         near.push([row + 1, cell + 1]);
                     }
+                    near.forEach((n) => {
+                        checkAround(n[0], n[1]);
+                    });
                 } else {
                     
                 }
