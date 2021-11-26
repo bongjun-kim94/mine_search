@@ -73,6 +73,7 @@ const reducer = (state, action) => {
             tableData.forEach((row, i) => {
                 tableData[i] = [...state.tableData[i]];
             });
+            const checkd = [];
             // 내 기준으로 검사하는 함수, 주변칸의 지뢰개수를 검사하는 함수
             // row, cell은 매개변수화를 시켰기 때문에 action 제거
             const checkAround = (row, cell) => {
@@ -84,32 +85,29 @@ const reducer = (state, action) => {
                 if (row < 0 || row > tableData.length || cell < 0 || cell > tableData[0].length) {
                     return;
                 }
-                let around = [];
+                // 닫힌 칸만 열기
+                if (checked.includes(row + ',' + cell)) { // 이미 검사한 칸이면
+                    return;
+                } else {
+                    // 한번 연 칸은 무시하기
+                    checkd.push(row + ',' + cell);
+                }
+                // 주변칸들 지뢰개수 셈
+                let around = [
+                    tableData[row][cell - 1], tableData[row][cell + 1],
+                ];
                 // 내 기준에서 셀의 윗 줄
                 if (tableData[row - 1]) {
-                    around = around.concat(
-                        tableData[row - 1][cell - 1],
-                        tableData[row - 1][cell],
-                        tableData[row - 1][cell + 1],
-                    );
+                    around = around.concat(tableData[row - 1][cell - 1], tableData[row - 1][cell], tableData[row - 1][cell + 1]);
                 }
-                // 내 기준에서 좌우
-                around = around.concat(
-                    tableData[row][cell - 1],
-                    tableData[row][cell + 1],
-                );
                 // 내 기준에서 셀의 아랫줄
                 if (tableData[row - 1]) {
-                    around = around.concat(
-                        tableData[row + 1][cell - 1],
-                        tableData[row + 1][cell],
-                        tableData[row + 1][cell + 1],
-                    );
+                    around = around.concat(tableData[row + 1][cell - 1], tableData[row + 1][cell], tableData[row + 1][cell + 1]);
                 }
                 const count = around.filter((v) => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
                 tableData[row][cell] = count;
-                // 내가 빈 칸이면 주변을 다 검사
-                if (count === 0) {
+                // 내가 빈 칸이면 주변을 다 검사, 주변칸 모아서 주변칸들 열어주는 것
+                if (count === 0) { // 주변칸 오픈
                     const near = [];
                     // 제일 윗칸이 없을때
                     if (row - 1 > -1) {
@@ -126,11 +124,13 @@ const reducer = (state, action) => {
                         near.push([row + 1, cell + 1]);
                     }
                     near.forEach((n) => {
-                        checkAround(n[0], n[1]);
-                    });
-                } else {
-                    
+                        // 이미 연 칸이 아니면 필터링, 주변칸도 닫혀있을 경우에만 오픈
+                        if (tableData[n[0][n[1]] !== CODE.OPENED]) {
+                            checkAround(n[0], n[1]);
+                        }
+                    })
                 }
+                tableData[row][cell] = count;
             };
             // 내 기준으로 검사를 해서 
             checkArround(action.row, action.cell);
