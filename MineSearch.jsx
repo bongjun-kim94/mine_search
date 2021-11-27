@@ -25,6 +25,7 @@ const initialState= {
     timer: 0,
     result: '',
     halted: false,
+    openedCount: 0,
 };
 
 // tableData에 지뢰를 심는 함수
@@ -59,21 +60,33 @@ const plantMine = (row, cell, mine) => {
 
 export const START_GAME = 'START_GAME';
 export const OPEN_CELL = 'OPEN_CELL';
+export const FLAG_CELL = 'FLAG_CELL';
+export const QUESTION_CELL = 'QUESTION_CELL';
+export const NORMALIZE_CELL = 'NORMALIZE_CELL';
 
 const reducer = (state, action) => {
     switch (action.type) {
         case START_GAME:
             return {
                 ...state,
-                tableData: plantMine(action.row, action.cell, action.mine)
+                // 배열보단 객체로 해야지 속성의 이름을 붙일수 있음
+                // data: [action.row, action.cell, action.mine],
+                data: {
+                    row: action.row,
+                    cell: action.cell,
+                    mine: action.mine,
+                },
+                tableData: plantMine(action.row, action.cell, action.mine),
+                halted: false,
             };
-        case OPEN_CELL:
+        case OPEN_CELL: {
             const tableData = [...state.tableData];
             // tableData[action.row] = [...state.tableData[action.row]];
             tableData.forEach((row, i) => {
                 tableData[i] = [...state.tableData[i]];
             });
-            const checkd = [];
+            const checked = [];
+            let count = 0;
             // 내 기준으로 검사하는 함수, 주변칸의 지뢰개수를 검사하는 함수
             // row, cell은 매개변수화를 시켰기 때문에 action 제거
             const checkAround = (row, cell) => {
@@ -82,7 +95,7 @@ const reducer = (state, action) => {
                     return;
                 }
                 // 상하좌우 칸이 아닌 경우 필터링
-                if (row < 0 || row > tableData.length || cell < 0 || cell > tableData[0].length) {
+                if (row < 0 || row >= tableData.length || cell < 0 || cell >= tableData[0].length) {
                     return;
                 }
                 // 닫힌 칸만 열기
@@ -90,8 +103,10 @@ const reducer = (state, action) => {
                     return;
                 } else {
                     // 한번 연 칸은 무시하기
-                    checkd.push(row + ',' + cell);
+                    checked.push(row + ',' + cell);
                 }
+                // 칸들 하나 열릴때마다 카운터 + 1
+                count += 1;
                 // 주변칸들 지뢰개수 셈
                 let around = [
                     tableData[row][cell - 1], tableData[row][cell + 1],
@@ -134,10 +149,13 @@ const reducer = (state, action) => {
             };
             // 내 기준으로 검사를 해서 
             checkArround(action.row, action.cell);
+
             return {
                 ...state,
                 tableData,
+                openedCount: state.openedCount + count,
             };
+        }
         case CLICK_MINE: {
             const tableData = [...state.tableData];
             tableData[action.row] = [...state.tableData[action.row]];
