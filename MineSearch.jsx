@@ -60,9 +60,11 @@ const plantMine = (row, cell, mine) => {
 
 export const START_GAME = 'START_GAME';
 export const OPEN_CELL = 'OPEN_CELL';
+export const CLICK_MINE = 'CLICK_MINE';
 export const FLAG_CELL = 'FLAG_CELL';
 export const QUESTION_CELL = 'QUESTION_CELL';
 export const NORMALIZE_CELL = 'NORMALIZE_CELL';
+export const INCREMENT_TIMER = 'INCREMENT_TIMER'
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -154,6 +156,8 @@ const reducer = (state, action) => {
                 ...state,
                 tableData,
                 openedCount: state.openedCount + count,
+                halted,
+                result,
             };
         }
         case CLICK_MINE: {
