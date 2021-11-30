@@ -5,7 +5,7 @@ const Form = memo(() => {
     const [row, setRow] = useState(10);
     const [cell, setCell] = useState(10);
     const [mine, setMine] = useState(20);
-    const value = useContext(TableContext);
+    const { dispatch } = useContext(TableContext);
 
     const onChangeRow = useCallback((e) => {
         setRow(e.target.value);

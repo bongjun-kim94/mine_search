@@ -45,13 +45,16 @@ const getTdText = (code) => {
         case CODE.QUESTION:
             return '?';
         default:
-            return '';
+            return code || '';
     } 
 };
 
 const Td = memo(({ rowIndex, cellIndex }) => {
-    const { tableData, dispatch } = useContext(TableContext);
+    const { tableData, dispatch, halted } = useContext(TableContext);
     const onClickTd = useCallback(() => {
+        if (halted) {
+            return;
+        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.OPENED:
             case CODE.FLAG_MINE:
@@ -64,8 +67,10 @@ const Td = memo(({ rowIndex, cellIndex }) => {
             case CODE.MINE:
                 dispatch({ type: CLICK_MINE, row: rowIndex, cell: cellIndex });
                 return;
+            default:
+                return;
         }
-    }, []);
+    }, [tableData][rowIndex][cellIndex], halted);
 
     const onRightClickTd = useCallback((e) => {
         e.preventDefault();
