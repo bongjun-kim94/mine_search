@@ -22,6 +22,12 @@ export const TableContext = createContext({
 
 const initialState= {
     tableData: [],
+    // 초기 세팅에 대한 데이터
+    data: {
+        row: 0,
+        cell: 0,
+        mine: 0,
+    },
     timer: 0,
     result: '',
     halted: false,
@@ -78,6 +84,7 @@ const reducer = (state, action) => {
                     cell: action.cell,
                     mine: action.mine,
                 },
+                openedCount: 0,
                 tableData: plantMine(action.row, action.cell, action.mine),
                 halted: false,
             };
@@ -88,7 +95,7 @@ const reducer = (state, action) => {
                 tableData[i] = [...state.tableData[i]];
             });
             const checked = [];
-            let count = 0;
+            let openedCount = 0;
             // 내 기준으로 검사하는 함수, 주변칸의 지뢰개수를 검사하는 함수
             // row, cell은 매개변수화를 시켰기 때문에 action 제거
             const checkAround = (row, cell) => {
@@ -108,7 +115,7 @@ const reducer = (state, action) => {
                     checked.push(row + ',' + cell);
                 }
                 // 칸들 하나 열릴때마다 카운터 + 1
-                count += 1;
+                openedCount += 1;
                 // 주변칸들 지뢰개수 셈
                 let around = [
                     tableData[row][cell - 1], tableData[row][cell + 1],
@@ -151,11 +158,17 @@ const reducer = (state, action) => {
             };
             // 내 기준으로 검사를 해서 
             checkArround(action.row, action.cell);
-
+            // 승리조건 체크
+            let halted = false;
+            let result = '';
+            if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) { // 승리
+                halted = true; // 게임을 멈추고
+                result = '승리하셨습니다.';
+            }
             return {
                 ...state,
                 tableData,
-                openedCount: state.openedCount + count,
+                openedCount: state.openedCount + openedCount,
                 halted,
                 result,
             };
