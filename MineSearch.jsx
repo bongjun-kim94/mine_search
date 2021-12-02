@@ -70,7 +70,7 @@ export const CLICK_MINE = 'CLICK_MINE';
 export const FLAG_CELL = 'FLAG_CELL';
 export const QUESTION_CELL = 'QUESTION_CELL';
 export const NORMALIZE_CELL = 'NORMALIZE_CELL';
-export const INCREMENT_TIMER = 'INCREMENT_TIMER'
+export const INCREMENT_TIMER = 'INCREMENT_TIMER';
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -87,6 +87,7 @@ const reducer = (state, action) => {
                 openedCount: 0,
                 tableData: plantMine(action.row, action.cell, action.mine),
                 halted: false,
+                timer: 0,
             };
         case OPEN_CELL: {
             const tableData = [...state.tableData];
@@ -163,7 +164,7 @@ const reducer = (state, action) => {
             let result = '';
             if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) { // 승리
                 halted = true; // 게임을 멈추고
-                result = '승리하셨습니다.';
+                result = `${state.timer}초 만에 승리하셨습니다.`;
             }
             return {
                 ...state,
@@ -222,6 +223,12 @@ const reducer = (state, action) => {
               tableData,
             };
         }
+        case INCREMENT_TIMER : {
+            return {
+                ...state,
+                timer: state.timer + 1,
+            }
+        }
         default:
             return state;
     }
@@ -229,14 +236,26 @@ const reducer = (state, action) => {
 
 const MineSearch = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const { tableData, halted, timer, result } = state;
     // state.tableData가 변경될 때 갱신
-    const value = useMemo(() => ({ tableData: state.tableData, dispatch }), [state.tableData]);
+    const value = useMemo(() => ({ tableData: tableData, halted, dispatch }), [tableData, halted]);
+
+    useEffect = (() => {
+        if (halted === false) {
+            const timer = setInterval(() => {
+                dispatch({ type: INCREMENT_TIMER });
+            }, 1000); // 1초마다 timer가 증가
+        }
+        return () => {
+            clearInterval(timer);
+        }
+    }, [halted]);
 
     return (
         <>
             <TableContext.Provider value={value}>
                 <Form />
-                <div>{state.timer}</div>
+                <div>{timer}</div>
                 <Table />
                 <div>{result}</div>
             </TableContext.Provider>
