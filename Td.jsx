@@ -1,5 +1,5 @@
 import React, { useContext, useCallback, memo } from 'react';
-import { CODE, OPEN_CELL, TableContext } from './MineSearch';
+import { CLICK_MINE, CODE, FLAG_CELL, NORMALIZE_CELL, OPEN_CELL, QUESTION_CELL, TableContext } from './MineSearch';
 
 const getTdStyle = (code) => {
     switch (code) {
@@ -61,6 +61,7 @@ const Td = memo(({ rowIndex, cellIndex }) => {
             case CODE.FLAG:
             case CODE.QUESTION_MINE:
             case CODE.QUESTION:
+                return;
             case CODE.NORMAL:
                 dispatch({ type: OPEN_CELL, row: rowIndex, cell: cellIndex });
                 return;
@@ -74,6 +75,9 @@ const Td = memo(({ rowIndex, cellIndex }) => {
 
     const onRightClickTd = useCallback((e) => {
         e.preventDefault();
+        if (halted) {
+            return;
+        }
         switch (tableData[rowIndex][cellIndex]) {
             case CODE.NORMAL:
             case CODE.MINE:
@@ -90,8 +94,12 @@ const Td = memo(({ rowIndex, cellIndex }) => {
             default:
                 return;
         }
-    }, [tableData[rowIndex][cellIndex]]);
-    
+    }, [tableData[rowIndex][cellIndex], halted]);
+
+    return <RealTd onClick={onClickTd} onRightClickTd={onRightClickTd} data={tableData[rowIndex][cellIndex]} />;
+});
+
+const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
     return(
         <>
             <td 
