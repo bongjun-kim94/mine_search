@@ -115,8 +115,6 @@ const reducer = (state, action) => {
                     // 한번 연 칸은 무시하기
                     checked.push(row + ',' + cell);
                 }
-                // 칸들 하나 열릴때마다 카운터 + 1
-                openedCount += 1;
                 // 주변칸들 지뢰개수 셈
                 let around = [
                     tableData[row][cell - 1], tableData[row][cell + 1],
@@ -154,6 +152,11 @@ const reducer = (state, action) => {
                             checkAround(n[0], n[1]);
                         }
                     })
+                }
+                // 지금 내 칸이 닫힌 칸이면 카운트 증가
+                if (tableData[row][cell] === CODE.NORMAL) {
+                    // 칸들 하나 열릴때마다 카운터 + 1
+                    openedCount += 1;
                 }
                 tableData[row][cell] = count;
             };
