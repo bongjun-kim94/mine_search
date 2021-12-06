@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, memo } from 'react';
+import React, { useContext, useCallback, useMemo ,memo } from 'react';
 import { CLICK_MINE, CODE, FLAG_CELL, NORMALIZE_CELL, OPEN_CELL, QUESTION_CELL, TableContext } from './MineSearch';
 
 const getTdStyle = (code) => {
@@ -71,7 +71,7 @@ const Td = memo(({ rowIndex, cellIndex }) => {
             default:
                 return;
         }
-    }, [tableData][rowIndex][cellIndex], halted);
+    }, [tableData[rowIndex][cellIndex], halted]);
 
     const onRightClickTd = useCallback((e) => {
         e.preventDefault();
@@ -103,12 +103,12 @@ const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
     return(
         <>
             <td 
-                style={getTdStyle(tableData[rowIndex][cellIndex])}
+                style={getTdStyle(data)}
                 onClick={onClickTd}
                 // 오른쪽 클릭시
                 onContextMenu={onRightClickTd}
             >
-                {getTdText(tableData[rowIndex][cellIndex])}
+                {getTdText(data)}
             </td>
         </>
     );
