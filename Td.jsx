@@ -100,7 +100,7 @@ const Td = memo(({ rowIndex, cellIndex }) => {
 });
 
 const RealTd = memo(({ onClickTd, onRightClickTd, data }) => {
-    return(
+    return (
         <>
             <td 
                 style={getTdStyle(data)}

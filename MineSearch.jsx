@@ -240,8 +240,8 @@ const reducer = (state, action) => {
 const MineSearch = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const { tableData, halted, timer, result } = state;
-    // state.tableData가 변경될 때 갱신
-    const value = useMemo(() => ({ tableData: tableData, halted, dispatch }), [tableData, halted]);
+    // state.tableData가 변경될 때 갱신, useMemo로 캐싱해놔야지 리렌더링 발생x
+    const value = useMemo(() => ({ tableData, halted, dispatch }), [tableData, halted]);
 
     useEffect = (() => {
         if (halted === false) {
